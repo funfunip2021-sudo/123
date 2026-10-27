@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>單一量思維大對決｜小三數學雙人遊戲</title>
+<style>
+:root{--ink:#20304a;--blue:#3b82f6;--pink:#ec4899;--gold:#fbbf24;--green:#16a34a;--paper:#fffdf7}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 10%,#dff7ff,transparent 30%),radial-gradient(circle at 90% 5%,#ffe3f1,transparent 28%),linear-gradient(135deg,#f8fbff,#fff7df);min-height:100vh}
+.wrap{max-width:1100px;margin:auto;padding:20px}
+header{text-align:center;padding:12px 8px 20px}
+h1{margin:0;font-size:clamp(1.8rem,4vw,3rem);color:#243b73;text-shadow:2px 3px 0 #fff}
+.subtitle{margin:8px 0;color:#52627b;font-size:1.05rem}
+.pill{display:inline-block;background:#fff;border:2px solid #dbeafe;border-radius:999px;padding:7px 14px;font-weight:800;margin-top:8px}
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0 16px}
+.player{background:#fff;border:3px solid #dbeafe;border-radius:20px;padding:14px 18px;box-shadow:0 6px 0 #d7e5f5;display:flex;align-items:center;gap:12px}
+.player.p2{border-color:#fbcfe8;box-shadow:0 6px 0 #f9d7e9}
+.player.active{outline:4px solid var(--gold);transform:translateY(-2px)}
+.avatar{font-size:2.2rem}.pname{font-size:1.1rem;font-weight:900}.score{font-size:2rem;font-weight:1000;margin-left:auto}
+.panel{background:#fff;border-radius:24px;padding:clamp(16px,3vw,30px);box-shadow:0 12px 35px #233b6617;border:2px solid #eef2ff}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.tag{background:#eef2ff;color:#344b91;padding:7px 12px;border-radius:12px;font-weight:900}
+.progress{height:10px;background:#edf2f7;border-radius:99px;overflow:hidden;flex:1;min-width:100px}.bar{height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#a78bfa);transition:width .3s}
+.story{font-size:clamp(1.25rem,2.5vw,1.8rem);font-weight:900;line-height:1.6;text-align:center;padding:20px 10px 12px;min-height:100px}
+.hint{text-align:center;color:#65748b;margin:0 0 18px}
+.work{background:#f8fbff;border:2px dashed #c5d7f4;border-radius:18px;padding:16px;margin:0 auto 18px;max-width:760px;text-align:center}
+.work h3{margin:0 0 10px;color:#334e87}
+.equation{font-size:clamp(1.15rem,2.8vw,1.6rem);font-weight:900;line-height:1.8}
+.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:760px;margin:auto}
+.option{border:3px solid #dbeafe;background:white;border-radius:16px;padding:15px 12px;font-size:1.25rem;font-weight:900;cursor:pointer;transition:.15s;color:#243b73}
+.option:hover{transform:translateY(-2px);border-color:#60a5fa;background:#eff6ff}
+.option:disabled{cursor:default;opacity:.8}.option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.option.wrong{background:#ffe4e6;border-color:#fb7185;color:#9f1239}
+.feedback{min-height:55px;text-align:center;font-weight:900;font-size:1.1rem;padding:14px 4px 0}
+.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+button.action{border:0;border-radius:14px;padding:12px 20px;font-size:1rem;font-weight:900;cursor:pointer;background:#3159b8;color:white;box-shadow:0 4px 0 #203f8e}
+button.action.secondary{background:#e9eef8;color:#34445f;box-shadow:0 4px 0 #ccd5e5}
+button.action:disabled{opacity:.45;cursor:not-allowed}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.rule{background:#ffffffc9;border-radius:16px;padding:13px;text-align:center;border:1px solid #e4eaf5;font-weight:700}
+.rule b{display:block;font-size:1.35rem;margin-bottom:5px}
+.end{text-align:center;padding:25px 10px}.end .winner{font-size:2rem;font-weight:1000;color:#3159b8}
+footer{text-align:center;color:#718096;font-size:.85rem;padding:18px}
+@media(max-width:620px){.wrap{padding:12px}.scoreboard{gap:8px}.player{padding:10px}.score{font-size:1.6rem}.options{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>⚡ 單一量思維大對決 ⚡</h1>
+  <p class="subtitle">小三數學・雙人輪流挑戰｜先找出「1份是多少」，再解決問題！</p>
+  <span class="pill">🎯 20 題挑戰 · 答對得 10 分</span>
+</header>
+<div class="scoreboard">
+  <div class="player active" id="player0"><div class="avatar">🦊</div><div><div class="pname">玩家 A</div><small>單一量高手</small></div><div class="score" id="score0">0</div></div>
+  <div class="player p2" id="player1"><div class="avatar">🐼</div><div><div class="pname">玩家 B</div><small>思維小達人</small></div><div class="score" id="score1">0</div></div>
+</div>
+<div class="panel" id="gamePanel">
+  <div class="topline"><span class="tag" id="turnTag">玩家 A 的回合</span><span class="tag" id="qCount">第 1 / 20 題</span><div class="progress"><div class="bar" id="bar"></div></div></div>
+  <div class="story" id="story"></div>
+  <p class="hint">想一想：先求一份的數量，再求題目要求的數量。</p>
+  <div class="work"><h3>🧠 思考小階梯</h3><div class="equation" id="equation"></div></div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <div class="controls"><button class="action secondary" id="hintBtn">💡 顯示提示</button><button class="action" id="nextBtn" disabled>下一題 ➜</button></div>
+</div>
+<div class="rules">
+  <div class="rule"><b>🔍 第一步</b>找出 1 份是多少</div>
+  <div class="rule"><b>✖️ 第二步</b>按份數乘回去</div>
+  <div class="rule"><b>🤝 輪流作答</b>每題換一位玩家</div>
+</div>
+<footer>教師提示：可讓學生先口述「單一量」的算式，再選答案。每局共 20 題。</footer>
+</div>
+<script>
+const questions = [
+ {s:"4 枝鉛筆售 12 元，買 7 枝要多少元？",e:"每枝：12 ÷ 4 = 3 元<br>7 枝：3 × 7 = ？",a:21,o:[18,21,24,28],why:"先求每枝：12 ÷ 4 = 3 元；再求 7 枝：3 × 7 = 21 元。"},
+ {s:"3 個橙重 450 克，5 個同樣的橙重多少克？",e:"每個：450 ÷ 3 = 150 克<br>5 個：150 × 5 = ？",a:750,o:[600,700,750,900],why:"每個橙重 150 克，5 個是 150 × 5 = 750 克。"},
+ {s:"6 張貼紙售 18 元，買 4 張要多少元？",e:"每張：18 ÷ 6 = 3 元<br>4 張：3 × 4 = ？",a:12,o:[9,12,15,24],why:"每張 3 元，4 張共 3 × 4 = 12 元。"},
+ {s:"5 瓶水共有 2,000 毫升，8 瓶同樣的水共有多少毫升？",e:"每瓶：2000 ÷ 5 = 400 毫升<br>8 瓶：400 × 8 = ？",a:3200,o:[2800,3000,3200,4000],why:"每瓶 400 毫升，8 瓶共 3,200 毫升。"},
+ {s:"4 本筆記簿共 36 元，買 9 本要多少元？",e:"每本：36 ÷ 4 = 9 元<br>9 本：9 × 9 = ？",a:81,o:[72,81,90,45],why:"每本 9 元，9 本共 9 × 9 = 81 元。"},
+ {s:"2 袋糖共有 16 粒，7 袋同樣的糖共有多少粒？",e:"每袋：16 ÷ 2 = 8 粒<br>7 袋：8 × 7 = ？",a:56,o:[48,54,56,64],why:"每袋 8 粒，7 袋共 56 粒。"},
+ {s:"3 張桌子可坐 12 人，8 張同樣的桌子可坐多少人？",e:"每張：12 ÷ 3 = 4 人<br>8 張：4 × 8 = ？",a:32,o:[24,28,32,36],why:"每張桌子坐 4 人，8 張可坐 32 人。"},
+ {s:"5 米彩帶售 40 元，買 3 米要多少元？",e:"每米：40 ÷ 5 = 8 元<br>3 米：8 × 3 = ？",a:24,o:[15,20,24,30],why:"每米 8 元，3 米共 24 元。"},
+ {s:"4 盒牛奶共有 1,000 毫升，10 盒共有多少毫升？",e:"每盒：1000 ÷ 4 = 250 毫升<br>10 盒：250 × 10 = ？",a:2500,o:[2000,2400,2500,4000],why:"每盒 250 毫升，10 盒共 2,500 毫升。"},
+ {s:"6 個氣球售 30 元，買 9 個要多少元？",e:"每個：30 ÷ 6 = 5 元<br>9 個：5 × 9 = ？",a:45,o:[35,40,45,54],why:"每個 5 元，9 個共 45 元。"},
+ {s:"7 本故事書共 56 元，3 本同樣的故事書要多少元？",e:"每本：56 ÷ 7 = 8 元<br>3 本：8 × 3 = ？",a:24,o:[18,21,24,28],why:"每本 8 元，3 本共 24 元。"},
+ {s:"8 個杯子共有 4,000 毫升的水，3 個杯子共有多少毫升？",e:"每個：4000 ÷ 8 = 500 毫升<br>3 個：500 × 3 = ？",a:1500,o:[1000,1200,1500,2000],why:"每個杯子有 500 毫升，3 個共 1,500 毫升。"},
+ {s:"3 包餅乾共有 27 塊，6 包共有多少塊？",e:"每包：27 ÷ 3 = 9 塊<br>6 包：9 × 6 = ？",a:54,o:[45,51,54,63],why:"每包 9 塊，6 包共 54 塊。"},
+ {s:"4 張車票共 60 元，買 7 張同樣的車票要多少元？",e:"每張：60 ÷ 4 = 15 元<br>7 張：15 × 7 = ？",a:105,o:[90,100,105,120],why:"每張車票 15 元，7 張共 105 元。"},
+ {s:"5 隻兔子一天吃 25 根紅蘿蔔，8 隻兔子一天吃多少根？",e:"每隻：25 ÷ 5 = 5 根<br>8 隻：5 × 8 = ？",a:40,o:[30,35,40,45],why:"每隻兔子吃 5 根，8 隻共 40 根。"},
+ {s:"6 個相同的紙盒可裝 42 顆珠子，4 個紙盒可裝多少顆？",e:"每盒：42 ÷ 6 = 7 顆<br>4 盒：7 × 4 = ？",a:28,o:[21,24,28,32],why:"每盒裝 7 顆，4 盒共 28 顆。"},
+ {s:"3 張卡紙共 24 元，買 5 張要多少元？",e:"每張：24 ÷ 3 = 8 元<br>5 張：8 × 5 = ？",a:40,o:[32,35,40,45],why:"每張 8 元，5 張共 40 元。"},
+ {s:"9 支蠟筆共有 72 克，4 支同樣的蠟筆共有多少克？",e:"每支：72 ÷ 9 = 8 克<br>4 支：8 × 4 = ？",a:32,o:[24,28,32,36],why:"每支 8 克，4 支共 32 克。"},
+ {s:"2 個蛋糕切成 16 件，5 個同樣的蛋糕可切成多少件？",e:"每個：16 ÷ 2 = 8 件<br>5 個：8 × 5 = ？",a:40,o:[32,36,40,48],why:"每個蛋糕切成 8 件，5 個共 40 件。"},
+ {s:"4 次跳繩共跳 120 下，按同樣速度跳 7 次，共跳多少下？",e:"每次：120 ÷ 4 = 30 下<br>7 次：30 × 7 = ？",a:210,o:[180,200,210,240],why:"每次 30 下，7 次共 210 下。"}
+];
+let idx=0, turn=0, scores=[0,0], answered=false, hintsUsed=0;
+const $=id=>document.getElementById(id);
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function render(){
+ if(idx>=questions.length){finish();return}
+ answered=false;hintsUsed=0;
+ const q=questions[idx];
+ $('story').textContent=q.s;
+ $('equation').innerHTML='先求單一量，再求所需數量。';
+ $('qCount').textContent=`第 ${idx+1} / ${questions.length} 題`;
+ $('bar').style.width=(idx/questions.length*100)+'%';
+ $('turnTag').textContent=`玩家 ${turn===0?'A':'B'} 的回合`;
+ $('player0').classList.toggle('active',turn===0);$('player1').classList.toggle('active',turn===1);
+ $('feedback').textContent='選出答案，為自己爭取 10 分！';
+ $('nextBtn').disabled=true;$('hintBtn').disabled=false;
+ const opts=shuffle(q.o);
+ $('options').innerHTML='';
+ opts.forEach(n=>{const b=document.createElement('button');b.className='option';b.textContent=n.toLocaleString('en-US');b.onclick=()=>choose(n,b);$('options').appendChild(b)});
+}
+function choose(n,btn){
+ if(answered)return;answered=true;
+ const q=questions[idx];const all=[...document.querySelectorAll('.option')];
+ all.forEach(b=>{b.disabled=true;if(Number(b.textContent.replace(/,/g,''))===q.a)b.classList.add('correct')});
+ if(n===q.a){scores[turn]+=10;$('feedback').textContent=`🎉 答對了！+10 分！${q.why}`}
+ else{btn.classList.add('wrong');$('feedback').textContent=`差一點！正確答案是 ${q.a.toLocaleString('en-US')}。${q.why}`}
+ $('score0').textContent=scores[0];$('score1').textContent=scores[1];
+ $('nextBtn').disabled=false;$('hintBtn').disabled=true;
+}
+$('hintBtn').onclick=()=>{if(answered)return;hintsUsed++;$('equation').innerHTML=questions[idx].e;$('feedback').textContent='提示已出現！看清楚「每份」是多少，再乘回所需份數。';$('hintBtn').disabled=true};
+$('nextBtn').onclick=()=>{idx++;turn=1-turn;render()};
+function finish(){
+ $('bar').style.width='100%';$('gamePanel').innerHTML=`<div class="end"><div style="font-size:4rem">🏆</div><h2>挑戰完成！</h2><p class="winner">${scores[0]===scores[1]?'🤝 平手！你們都是單一量高手！':scores[0]>scores[1]?'🦊 玩家 A 勝出！':'🐼 玩家 B 勝出！'}</p><p style="font-size:1.25rem">玩家 A：<b>${scores[0]} 分</b>　｜　玩家 B：<b>${scores[1]} 分</b></p><p>記住解題秘訣：先求一份，再按份數乘回去！</p><button class="action" onclick="location.reload()">🔁 再玩一次</button></div>`;
+}
+render();
+</script>
+</body>
+</html>
